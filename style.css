@@ -34,10 +34,10 @@ body {
 }
 
 #game .card .front {
-  background-color: blue;
+  background-color: #1c7ed6;
 }
 #game .card .back {
-  background-color: red;
+  background-color: #f03e3e;
   transform: rotateY(180deg);
 }
 

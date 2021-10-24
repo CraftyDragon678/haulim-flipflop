@@ -1,0 +1,50 @@
+body {
+  margin: 0;
+  perspective: 1000px;
+}
+
+#game > div {
+  display: flex;
+  column-gap: 10px;
+}
+
+#game {
+  display: flex;
+  flex-direction: column;
+  row-gap: 10px;
+}
+
+#game .card {
+  transition: transform 1s;
+  transform-style: preserve-3d;
+  height: 100px;
+  width: 70px;
+  position: relative;
+}
+#game .card .front,
+#game .card .back {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  display: grid;
+  place-items: center;
+  font-size: 2rem;
+}
+
+#game .card .front {
+  background-color: blue;
+}
+#game .card .back {
+  background-color: red;
+  transform: rotateY(180deg);
+}
+
+#game .card:not(.flipped) {
+  cursor: pointer;
+}
+
+#game .card.flipped {
+  transform: rotateY(180deg);
+}

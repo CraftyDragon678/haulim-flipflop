@@ -1,11 +1,13 @@
+// @ts-check
+
 class Game {
   static isInit = false;
 
   /**
    * @private
-   * @type {[number, number][]}
+   * @type {[number, number] | null}
    */
-  clickQueue = [];
+  lastClicked = null;
 
   /**
    * @private
@@ -13,22 +15,27 @@ class Game {
    */
   cards = [];
 
+  confetti = null;
+
   /**
    * @param {HTMLDivElement} gameContainer
    */
   constructor(gameContainer) {
     this.gameContainer = gameContainer;
-
     if (!Game.isInit) {
+      this.confetti = new JSConfetti();
       Game.isInit = true;
+      /** @type {string[]} */
       const alphanum = [
         ...[...Array(18)].map((_, index) => String.fromCharCode(index + 65)),
         ...[...Array(18)].map((_, index) => String.fromCharCode(index + 65)),
       ]
-        .map((a) => [a, Math.random()])
+        .map(
+          /** @returns {[string, number]} */
+          (a) => [a, Math.random()],
+        )
         .sort(([, a], [, b]) => a - b)
         .map(([a]) => a);
-      console.log(alphanum);
       for (let x = 0; x < 6; x += 1) {
         this.cards.push([]);
         const card = document.createElement('div');
@@ -36,42 +43,55 @@ class Game {
           const innerCard = document.createElement('div');
           innerCard.className = 'card';
           const frontCard = document.createElement('div');
-          frontCard.classList = 'front';
+          frontCard.classList.add('front');
           const backCard = document.createElement('div');
-          backCard.classList = 'back';
+          backCard.classList.add('back');
           backCard.innerHTML = alphanum.splice(0, 1)[0];
           innerCard.appendChild(frontCard);
           innerCard.appendChild(backCard);
           card.appendChild(innerCard);
+
           innerCard.addEventListener('click', () => {
-            if (this.clickQueue.length >= 2) return;
-            this.clickQueue.push([x, y]);
-            innerCard.classList.add('flipped');
-            if (this.clickQueue.length < 2) return;
-            const [lastTileX, lastTileY] =
-              this.clickQueue[this.clickQueue.length - 2];
-            if (
-              this.cards[lastTileX][lastTileY][2].innerHTML !==
-              backCard.innerHTML
-            ) {
+            if (innerCard.classList.contains('flipped')) return;
+            innerCard.classList.add('flipped', 'selected');
+            if (!this.lastClicked) {
+              this.lastClicked = [x, y];
+              return;
+            }
+            if (this.lastClicked[0] === x && this.lastClicked[1] === y) return;
+            const [lastX, lastY] = this.lastClicked;
+            this.lastClicked = null;
+            innerCard.classList.remove('selected');
+            this.cards[lastX][lastY][0].classList.remove('selected');
+            if (this.cards[lastX][lastY][2].innerHTML !== backCard.innerHTML) {
               setTimeout(() => {
                 innerCard.classList.remove('flipped');
-                this.cards[lastTileX][lastTileY][0].classList.remove('flipped');
-                this.clickQueue.splice(0, 2);
+                this.cards[lastX][lastY][0].classList.remove('flipped');
               }, 1e3);
             } else {
-              this.clickQueue.splice(0, 2);
+              if (this.checkAllFlipped()) {
+                this.confetti.addConfetti();
+              }
             }
           });
           this.cards[x].push([innerCard, frontCard, backCard]);
         }
         this.gameContainer.appendChild(card);
       }
+      console.log(
+        this.cards
+          .map((cards) => cards.map((card) => card[2].innerHTML).join(' '))
+          .join('\n'),
+      );
     }
   }
+
+  checkAllFlipped = () =>
+    this.cards.flat().every(([, , a]) => a.classList.contains('flipped'));
 }
 
 (() => {
+  /** @type {HTMLDivElement} */
   const gameContainer = document.querySelector('#game');
   const game = new Game(gameContainer);
 })();

@@ -25,6 +25,7 @@ body {
 }
 #game .card .front,
 #game .card .back {
+  box-sizing: border-box;
   position: absolute;
   height: 100%;
   width: 100%;
@@ -33,6 +34,9 @@ body {
   display: grid;
   place-items: center;
   font-size: 2rem;
+  border: 0px solid yellow;
+  border-width: 0px;
+  transition: border-width 0.3sa;
 }
 
 #game .card .front {
@@ -49,4 +53,9 @@ body {
 
 #game .card.flipped {
   transform: rotateY(180deg);
+}
+
+#game .card.selected .front,
+#game .card.selected .back {
+  border-width: 5px;
 }

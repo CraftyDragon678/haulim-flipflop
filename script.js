@@ -26,16 +26,15 @@ class Game {
       this.confetti = new JSConfetti();
       Game.isInit = true;
       /** @type {string[]} */
-      const alphanum = [
-        ...[...Array(18)].map((_, index) => String.fromCharCode(index + 65)),
-        ...[...Array(18)].map((_, index) => String.fromCharCode(index + 65)),
-      ]
-        .map(
-          /** @returns {[string, number]} */
-          (a) => [a, Math.random()],
-        )
-        .sort(([, a], [, b]) => a - b)
-        .map(([a]) => a);
+      const alphanum =
+        '하울림웹프로젝트동아리기획디자인개발하울림웹프로젝트동아리기획디자인개발'
+          .split('')
+          .map(
+            /** @returns {[string, number]} */
+            (a) => [a, Math.random()],
+          )
+          .sort(([, a], [, b]) => a - b)
+          .map(([a]) => a);
       for (let x = 0; x < 6; x += 1) {
         this.cards.push([]);
         const card = document.createElement('div');
@@ -87,7 +86,7 @@ class Game {
   }
 
   checkAllFlipped = () =>
-    this.cards.flat().every(([, , a]) => a.classList.contains('flipped'));
+    this.cards.flat().every(([a]) => a.classList.contains('flipped'));
 }
 
 (() => {
